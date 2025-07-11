@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { TaskComponent } from './task/task.component';
 import { NewTaskComponent } from './new-task/new-task.component';
+import { NewTaskData } from './task/task.model';
+import { TasksSercie } from './tasks.service';
 
 @Component({
   selector: 'app-tasks',
@@ -13,36 +15,31 @@ export class TasksComponent {
   @Input() name?: string;
   @Input({ required: true }) userId!: string;
   isAddingTask = false;
-  tasks = [
-    {
-      id: 't1',
-      userId: 'u1',
-      title: 'Give dog a haircut',
-      summary: 'His fur is too long',
-      dueDate: '2025-12-24',
-    },
-    {
-      id: 't2',
-      userId: 'u2',
-      title: 'Learn swimming',
-      summary: 'Want to be strong',
-      dueDate: '2027-12-24',
-    },
-  ];
 
-  get selectedUserTasks() {
-    return this.tasks.filter((task) => task.userId === this.userId);
+  private tasksService: TasksSercie;
+
+  constructor(tasksService: TasksSercie) {
+    this.tasksService = tasksService;
   }
 
-  onCompleteTask(id: string) {
-    this.tasks = this.tasks.filter((task) => task.id !== id);
+  get selectedUserTasks() {
+    return this.tasksService.getUserTasks(this.userId);
   }
 
   onStartAddTask() {
     this.isAddingTask = true;
   }
 
+  onCompleteTask(taskId: string) {
+    this.tasksService.removeTask(taskId);
+  }
+
   onCancelTask() {
     this.isAddingTask = false;
   }
+
+  // onAddTask(taskData: NewTaskData) {
+  //   this.tasksService.addTask(taskData, this.userId);
+  //   this.isAddingTask = false;
+  // }
 }
